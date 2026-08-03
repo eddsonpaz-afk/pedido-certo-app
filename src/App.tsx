@@ -135,9 +135,9 @@ const emptyCustomer: Customer = {
 };
 
 const demoOrders: SavedOrder[] = [
-  { id: "PED-2026-0084", customer: "Mega Nordeste", createdAt: "Hoje, 14:32", status: "Aprovado", items: 13, total: 15633.25 },
-  { id: "PED-2026-0083", customer: "Armazém da Construção", createdAt: "Hoje, 11:08", status: "Em aprovação", items: 8, total: 8240.9 },
-  { id: "PED-2026-0082", customer: "Ramacon", createdAt: "Ontem, 16:47", status: "Rascunho", items: 5, total: 3198.4 },
+  { id: "PED-2026-0084", customer: "Cliente Demonstração A", createdAt: "Hoje, 14:32", status: "Aprovado", items: 13, total: 15633.25 },
+  { id: "PED-2026-0083", customer: "Cliente Demonstração B", createdAt: "Hoje, 11:08", status: "Em aprovação", items: 8, total: 8240.9 },
+  { id: "PED-2026-0082", customer: "Cliente Demonstração C", createdAt: "Ontem, 16:47", status: "Rascunho", items: 5, total: 3198.4 },
 ];
 
 const currency = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
@@ -214,20 +214,20 @@ function App() {
       .filter(Boolean) as OrderItem[];
     setItems(demoItems);
     setCustomer({
-      customerCode: "CLI-0284",
-      companyName: "MEGA NORDESTE MATERIAIS DE CONSTRUÇÃO LTDA.",
-      tradeName: "Mega Nordeste",
-      document: "12.345.678/0001-90",
-      buyer: "Marcos Oliveira",
-      phone: "(85) 99999-2233",
-      email: "compras@meganordeste.com.br",
+      customerCode: "CLI-DEMO",
+      companyName: "CLIENTE DEMONSTRAÇÃO LTDA.",
+      tradeName: "Cliente Demonstração",
+      document: "",
+      buyer: "Comprador de exemplo",
+      phone: "",
+      email: "",
       city: "Fortaleza",
       state: "CE",
       region: "Nordeste",
-      salesRep: "Juacilo Martins",
-      seller: "Deives",
+      salesRep: "Representante de exemplo",
+      seller: "Vendedor de exemplo",
       payment: "5 boletos - 30/45/60/75/90 dias",
-      notes: "Entregar no centro de distribuição principal.",
+      notes: "Pedido preenchido apenas para demonstração do layout.",
     });
   }, [demoMode, products, items.length]);
 
