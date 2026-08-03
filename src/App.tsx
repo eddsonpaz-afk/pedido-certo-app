@@ -318,11 +318,15 @@ function App() {
     <div className="app-shell">
       <aside className={`sidebar ${mobileNav ? "sidebar-open" : ""}`}>
         <div className="brand-block">
-          <div className="brand-mark"><Package2 size={22} strokeWidth={2.4} /></div>
-          <div>
-            <strong>Pedido Certo</strong>
-            <span>CBS + Waves Plus</span>
+          <div className="brand-logos">
+            <span className="brand-logo-card cbs-logo-card">
+              <img src="/brands/cbs-logo.webp" alt="CBS Importadora" />
+            </span>
+            <span className="brand-logo-card waves-logo-card">
+              <img src="/brands/waves-plus-logo.webp" alt="Waves Plus" />
+            </span>
           </div>
+          <span className="product-name">Pedido Certo</span>
           <button className="sidebar-close" onClick={() => setMobileNav(false)} aria-label="Fechar menu"><X size={20} /></button>
         </div>
 
@@ -357,7 +361,7 @@ function App() {
       <main className="main-area">
         <header className="topbar">
           <button className="mobile-menu" onClick={() => setMobileNav(true)} aria-label="Abrir menu"><Menu size={22} /></button>
-          <div className="mobile-brand">Pedido Certo</div>
+          <div className="mobile-brand"><span>PC</span> Pedido Certo</div>
           <div className="topbar-spacer" />
           <div className="base-status"><span className="status-dot" /> Preços atualizados</div>
           <button className="icon-button" aria-label="Notificações"><Bell size={19} /><span className="notification-dot" /></button>
@@ -393,6 +397,13 @@ function App() {
           />
         )}
       </main>
+      <nav className="mobile-bottom-nav" aria-label="Navegação inferior">
+        <button className={view === "dashboard" ? "active" : ""} onClick={() => navigate("dashboard")}><LayoutDashboard size={19} /><span>Início</span></button>
+        <button className={view === "pedidos" ? "active" : ""} onClick={() => navigate("pedidos")}><ClipboardList size={19} /><span>Pedidos</span></button>
+        <button className={`mobile-new-order ${view === "novo" ? "active" : ""}`} onClick={() => navigate("novo")} aria-label="Novo pedido"><Plus size={22} /><span>Novo</span></button>
+        <button disabled><Users size={19} /><span>Clientes</span></button>
+        <button disabled><UserRound size={19} /><span>Perfil</span></button>
+      </nav>
       {toast && <div className="toast"><CheckCircle2 size={19} /><span>{toast}</span><button onClick={() => setToast("")}><X size={16} /></button></div>}
     </div>
   );
@@ -403,37 +414,51 @@ function Dashboard({ orders, onNewOrder, onViewOrders }: { orders: SavedOrder[];
   return (
     <div className="page dashboard-page">
       <section className="page-heading heading-with-action">
-        <div><span className="eyebrow">SEGUNDA-FEIRA, 3 DE AGOSTO</span><h1>Bom dia, Edson.</h1><p>Seus pedidos e oportunidades, sem planilha aberta em quinze abas.</p></div>
+        <div><span className="eyebrow">OLÁ, EDSON 👋</span><h1>Bem-vindo de volta!</h1><p>Acompanhe o ritmo comercial da sua operação.</p></div>
         <button className="primary-button" onClick={onNewOrder}><Plus size={19} /> Novo pedido</button>
       </section>
 
-      <section className="metrics-grid">
-        <MetricCard icon={<CircleDollarSign size={20} />} label="Volume em pedidos" value={currency.format(total)} detail="mês atual" tone="navy" />
-        <MetricCard icon={<ClipboardList size={20} />} label="Pedidos no período" value={String(orders.length + 21).padStart(2, "0")} detail="+12% versus julho" tone="yellow" />
-        <MetricCard icon={<Clock3 size={20} />} label="Aguardando aprovação" value="04" detail="2 precisam de atenção" tone="red" />
-        <MetricCard icon={<TrendingUp size={20} />} label="Ticket médio" value={currency.format(total / Math.max(orders.length, 1))} detail="mês atual" tone="green" />
+      <section className="dashboard-summary-grid">
+        <div className="sales-highlight">
+          <div className="sales-copy"><span>Vendas no mês</span><strong>{currency.format(total)}</strong><small><TrendingUp size={14} /> 12,5% em relação a julho</small></div>
+          <div className="sales-card-art"><CircleDollarSign size={32} /></div>
+        </div>
+        <div className="orders-highlight panel">
+          <div><span>Pedidos ativos</span><strong>{String(orders.length + 21).padStart(2, "0")}</strong><small>3 novos hoje</small></div>
+          <ClipboardList size={26} />
+        </div>
+        <div className="orders-highlight panel approval-highlight">
+          <div><span>Em aprovação</span><strong>04</strong><small>2 pedem atenção</small></div>
+          <Clock3 size={26} />
+        </div>
+      </section>
+
+      <section className="quick-actions-section">
+        <div className="section-label-row"><h2>Ações rápidas</h2><span>Atalhos principais</span></div>
+        <div className="quick-actions-grid">
+          <button className="neon-action action-blue" onClick={onNewOrder}><ShoppingCart size={22} /><span>Novo pedido</span></button>
+          <button className="neon-action action-purple" onClick={onNewOrder}><Search size={22} /><span>Catálogo</span></button>
+          <button className="neon-action action-red" onClick={onNewOrder}><FileText size={22} /><span>Rascunho</span></button>
+          <button className="neon-action action-dark" onClick={onViewOrders}><MoreHorizontal size={22} /><span>Mais</span></button>
+        </div>
       </section>
 
       <section className="dashboard-grid">
         <div className="panel recent-panel">
-          <div className="panel-heading"><div><h2>Pedidos recentes</h2><p>Acompanhe o andamento das últimas negociações.</p></div><button className="text-button" onClick={onViewOrders}>Ver todos <ArrowRight size={16} /></button></div>
+          <div className="panel-heading"><div><h2>Atividade recente</h2><p>Acompanhe o andamento das últimas negociações.</p></div><button className="text-button" onClick={onViewOrders}>Ver todos <ArrowRight size={16} /></button></div>
           <div className="recent-list">
             {orders.slice(0, 4).map((order) => <OrderRow key={order.id} order={order} />)}
           </div>
         </div>
-        <div className="panel quick-panel">
-          <div className="panel-heading"><div><h2>Acesso rápido</h2><p>Comece pelo que importa.</p></div></div>
-          <button className="quick-action featured" onClick={onNewOrder}><span className="quick-icon"><ShoppingCart size={21} /></span><span><strong>Criar novo pedido</strong><small>Busque o cliente e adicione produtos</small></span><ArrowRight size={18} /></button>
-          <button className="quick-action"><span className="quick-icon light"><FileText size={21} /></span><span><strong>Continuar rascunho</strong><small>Retome o último pedido salvo</small></span><ArrowRight size={18} /></button>
-          <div className="data-note"><Package2 size={18} /><div><strong>Catálogo pronto</strong><span>562 códigos ligados à tabela de preços.</span></div></div>
+        <div className="panel order-pulse-panel">
+          <div className="panel-heading"><div><h2>Pedidos ativos</h2><p>Distribuição da operação.</p></div></div>
+          <div className="status-ring"><span>{orders.length + 21}</span></div>
+          <div className="pulse-legend"><span><i className="legend-approved" />Aprovados <strong>58%</strong></span><span><i className="legend-review" />Em aprovação <strong>20%</strong></span><span><i className="legend-draft" />Rascunhos <strong>22%</strong></span></div>
+          <div className="data-note"><Package2 size={18} /><div><strong>Catálogo sincronizado</strong><span>562 produtos • Tabela de junho</span></div></div>
         </div>
       </section>
     </div>
   );
-}
-
-function MetricCard({ icon, label, value, detail, tone }: { icon: React.ReactNode; label: string; value: string; detail: string; tone: string }) {
-  return <div className="metric-card"><div className={`metric-icon ${tone}`}>{icon}</div><div className="metric-label">{label}</div><strong>{value}</strong><span>{detail}</span></div>;
 }
 
 function OrderRow({ order }: { order: SavedOrder }) {
