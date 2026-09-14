@@ -1,6 +1,7 @@
 (()=>{
   const API='/api/sheets';
   const pendingKey='cbs_sync_pending';
+  const syncedEmailKey='cbs_client_synced_email';
 
   const read=(k,f)=>{try{return JSON.parse(localStorage.getItem(k)||JSON.stringify(f))}catch{return f}};
   const savePending=p=>{const a=read(pendingKey,[]);a.push({...p,queuedAt:new Date().toISOString()});localStorage.setItem(pendingKey,JSON.stringify(a.slice(-100)))};
@@ -24,16 +25,44 @@
     const password=String(fd.get('password')||'');
     const confirm=String(fd.get('confirm')||'');
     if(!fd.get('name')||password.length<6||password!==confirm)return;
+    const email=String(fd.get('email')||'').trim().toLowerCase();
     const payload={
       action:'register',
       name:String(fd.get('name')||''), company:String(fd.get('company')||''),
       document:String(fd.get('doc')||''), phone:String(fd.get('phone')||''),
-      email:String(fd.get('email')||'').trim().toLowerCase(),
+      email,
       passwordHash:await sha256(password), origin:'App CBS/Waves Plus'
     };
     const out=await post(payload);
     if(out?.id){
       const u=read('cbs_user',{});u.id=out.id;localStorage.setItem('cbs_user',JSON.stringify(u));
+      localStorage.setItem(syncedEmailKey,email);
+    }
+    return out;
+  }
+
+  async function syncStoredUser(){
+    const u=read('cbs_user',null);
+    if(!u?.email||!u?.name)return null;
+    const email=String(u.email).trim().toLowerCase();
+    if(localStorage.getItem(syncedEmailKey)===email)return null;
+    const login=read('cbs_login',null);
+    let passwordHash='';
+    if(login&&String(login.email||'').trim().toLowerCase()===email&&login.password){
+      passwordHash=await sha256(String(login.password));
+    }
+    const payload={
+      action:'register',
+      name:String(u.name||''), company:String(u.company||''),
+      document:String(u.document||u.doc||''), phone:String(u.phone||''),
+      email,
+      passwordHash,
+      origin:'App CBS/Waves Plus • migração automática'
+    };
+    const out=await post(payload);
+    if(out?.id){
+      u.id=out.id;localStorage.setItem('cbs_user',JSON.stringify(u));
+      localStorage.setItem(syncedEmailKey,email);
     }
     return out;
   }
@@ -90,7 +119,12 @@
     }
   },true);
 
-  window.CBSSheetsSync={post,syncOrderById,flush};
-  window.addEventListener('online',flush);
-  setTimeout(flush,1200);
+  async function recoverAndFlush(){
+    await flush();
+    await syncStoredUser();
+  }
+
+  window.CBSSheetsSync={post,syncOrderById,flush,syncStoredUser};
+  window.addEventListener('online',recoverAndFlush);
+  setTimeout(recoverAndFlush,1000);
 })();
