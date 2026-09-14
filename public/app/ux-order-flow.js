@@ -7,17 +7,21 @@
 
   function renameNav(){
     document.querySelectorAll('.bottom-nav [data-go="categories"]').forEach(btn=>{
+      if(btn.dataset.uxOrderTab==='1')return;
+      btn.dataset.uxOrderTab='1';
       btn.classList.add('ux-order-tab');
       btn.setAttribute('aria-label','Fazer novo pedido');
-      const ico=btn.querySelector('.navico');if(ico)ico.textContent='＋';
-      const spans=btn.querySelectorAll('span');if(spans.length)spans[spans.length-1].textContent='Pedir';
+      const ico=btn.querySelector('.navico');if(ico&&ico.textContent!=='＋')ico.textContent='＋';
+      const spans=btn.querySelectorAll('span');
+      const label=spans.length?spans[spans.length-1]:null;
+      if(label&&label.textContent!=='Pedir')label.textContent='Pedir';
     });
   }
 
   function goHomeThen(fn){
     const home=document.querySelector('[data-go="home"]');
     if(home)home.click();
-    setTimeout(fn,40);
+    setTimeout(fn,50);
   }
 
   function goAllProducts(){
@@ -35,10 +39,15 @@
   }
 
   function addCartDock(screen){
-    screen.querySelector('.ux-cart-dock')?.remove();
-    const items=cartEntries();if(!items.length)return;
+    const items=cartEntries();
+    const existing=screen.querySelector('.ux-cart-dock');
+    if(!items.length){if(existing)existing.remove();return}
     const nav=screen.querySelector('.bottom-nav');if(!nav)return;
-    const dock=document.createElement('div');dock.className='ux-cart-dock';
+    const key=`${items.length}|${cartTotal()}`;
+    if(existing&&existing.dataset.cartKey===key)return;
+    if(existing)existing.remove();
+    const dock=document.createElement('div');
+    dock.className='ux-cart-dock';dock.dataset.cartKey=key;
     dock.innerHTML=`<div><small>Pedido em andamento</small><b>${items.length} ${items.length===1?'item':'itens'} • ${money(cartTotal())}</b></div><button type="button" data-ux-cart>Ver pedido →</button>`;
     nav.insertAdjacentElement('beforebegin',dock);
     dock.querySelector('[data-ux-cart]').onclick=()=>screen.querySelector('[data-go="cart"]')?.click();
@@ -48,7 +57,7 @@
     const h=[...document.querySelectorAll('.page-title h1')].find(x=>x.textContent.trim()==='Categorias'||x.textContent.trim()==='Novo pedido');
     if(!h)return;
     const screen=h.closest('.screen');if(!screen)return;
-    h.textContent='Novo pedido';
+    if(h.textContent.trim()!=='Novo pedido')h.textContent='Novo pedido';
     if(screen.dataset.uxPedir!=='1'){
       screen.dataset.uxPedir='1';
       const title=h.closest('.page-title');
@@ -70,8 +79,16 @@
   }
 
   function enhanceOtherLinks(){
-    document.querySelectorAll('.profile-actions [data-go="categories"]').forEach(b=>{b.innerHTML='＋ &nbsp; Fazer novo pedido'});
-    document.querySelectorAll('.empty [data-go="categories"]').forEach(b=>{b.textContent='Começar novo pedido'});
+    document.querySelectorAll('.profile-actions [data-go="categories"]').forEach(b=>{
+      if(b.dataset.uxPedirLink==='1')return;
+      b.dataset.uxPedirLink='1';
+      b.innerHTML='＋ &nbsp; Fazer novo pedido';
+    });
+    document.querySelectorAll('.empty [data-go="categories"]').forEach(b=>{
+      if(b.dataset.uxPedirLink==='1')return;
+      b.dataset.uxPedirLink='1';
+      b.textContent='Começar novo pedido';
+    });
   }
 
   let routed=false;
@@ -88,8 +105,14 @@
     },80);
   }
 
+  let scheduled=false;
+  function scheduleRun(){
+    if(scheduled)return;
+    scheduled=true;
+    requestAnimationFrame(()=>{scheduled=false;run()});
+  }
   function run(){renameNav();enhancePedir();enhanceBrowse();enhanceOtherLinks();routeFlags()}
-  new MutationObserver(()=>queueMicrotask(run)).observe(document.getElementById('app')||document.body,{childList:true,subtree:true});
-  window.addEventListener('storage',run);
+  new MutationObserver(scheduleRun).observe(document.getElementById('app')||document.body,{childList:true,subtree:true});
+  window.addEventListener('storage',scheduleRun);
   run();
 })();
