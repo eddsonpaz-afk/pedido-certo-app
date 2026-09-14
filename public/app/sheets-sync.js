@@ -35,6 +35,7 @@
     if(out?.id){
       const u=read('cbs_user',{});u.id=out.id;localStorage.setItem('cbs_user',JSON.stringify(u));
     }
+    return out;
   }
 
   function normalizeOrder(o){
@@ -51,8 +52,8 @@
   }
 
   async function syncOrderById(id){
-    const all=read('cbs_orders_v2',[]);const o=all.find(x=>x.id===id);if(!o)return;
-    await post({action:'order',order:normalizeOrder(o)});
+    const all=read('cbs_orders_v2',[]);const o=all.find(x=>x.id===id);if(!o)return null;
+    return await post({action:'order',order:normalizeOrder(o)});
   }
 
   async function flush(){
@@ -69,7 +70,6 @@
 
   document.addEventListener('submit',e=>{
     const f=e.target;if(f?.id!=='authForm'||!f.querySelector('[name="name"]'))return;
-    const snapshot=f.cloneNode(true);
     const data=new FormData(f);
     setTimeout(()=>{
       const fake=document.createElement('form');
@@ -82,7 +82,7 @@
     if(e.target.closest('[data-go="send"]')){
       setTimeout(()=>{const id=localStorage.getItem('cbs_current_order_id');if(id)syncOrderById(id)},250);
     }
-    if(e.target.closest('#sendWa,.order-resend,[data-pdf-whatsapp]')){
+    if(e.target.closest('#sendWa,.order-resend,.pdf-whatsapp,[data-pdf-whatsapp]')){
       setTimeout(()=>{
         const id=localStorage.getItem('cbs_current_order_id');
         if(id)syncOrderById(id);else{const a=read('cbs_orders_v2',[]);if(a[0]?.id)syncOrderById(a[0].id)}
