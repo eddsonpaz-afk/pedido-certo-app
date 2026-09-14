@@ -1,8 +1,5 @@
 export default async function handler(req, res) {
-  const url = process.env.GOOGLE_APPS_SCRIPT_URL;
-  if (!url) {
-    return res.status(503).json({ ok: false, error: 'GOOGLE_APPS_SCRIPT_URL não configurada' });
-  }
+  const url = process.env.GOOGLE_APPS_SCRIPT_URL || 'https://script.google.com/macros/s/AKfycbwYASgfXXWBJCM933mgfXTmL09nY_34bBdb2Viq6ptB1CcVtGie0_hi05JlvPwnvzM0/exec';
   try {
     if (req.method === 'GET') {
       const r = await fetch(url, { redirect: 'follow' });
