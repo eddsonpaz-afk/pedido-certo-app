@@ -196,6 +196,17 @@ button:not(:disabled):active{transform:scale(.98)}
 
 .mini-product{min-height:164px;padding:9px;border-radius:16px!important}
 .mini-product .pimg{height:88px;border-radius:12px;box-shadow:0 8px 21px rgba(0,0,0,.27)}
+.pimg-hires{
+  overflow:hidden;
+  background:#fff;
+  background-image:none!important;
+}
+.pimg-hires img{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+}
 .mini-product b{font-size:11px;line-height:1.18;color:#f4f5ff}
 .mini-product small,.prod-code,.cart-row small{color:#69c8ff}
 
