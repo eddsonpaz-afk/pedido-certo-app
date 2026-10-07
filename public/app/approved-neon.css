@@ -271,6 +271,9 @@ button:not(:disabled):active{transform:scale(.98)}
 .list-meta{margin:17px 3px 11px;color:#9da6d0}
 .product-list{gap:11px}
 .product-row{grid-template-columns:104px 1fr;gap:13px;padding:11px;border-radius:17px}
+.product-row[data-product]{cursor:pointer;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+.product-row[data-product]:hover{transform:translateY(-1px);border-color:rgba(166,175,255,.48);box-shadow:0 12px 30px rgba(0,0,0,.32),0 0 20px rgba(124,53,255,.15)}
+.product-row [data-qty],.product-row [data-add]{cursor:pointer}
 .product-row .pimg{height:102px;border-radius:13px;box-shadow:0 7px 22px rgba(0,0,0,.28)}
 .prod-name{font-size:13px;color:#fff}
 .prod-min{color:#8e97c3}
